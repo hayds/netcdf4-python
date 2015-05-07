@@ -39,20 +39,14 @@ else:
 
 def check_hdf5version(hdf5_includedir):
     try:
-        sys.stdout.write('checking for H5pubconf-64.h')
         f = open(os.path.join(hdf5_includedir,'H5pubconf-64.h'),**open_kwargs)
     except IOError:
         try:
-            sys.stdout.write('checking for H5pubconf-32.h')
             f = open(os.path.join(hdf5_includedir,'H5pubconf-32.h'),**open_kwargs)
         except IOError:
             try:
-                sys.stdout.write('checking for H5pubconf.h')
                 f = open(os.path.join(hdf5_includedir,'H5pubconf.h'),**open_kwargs)
-            except IOError, e:
-                #sys.stdout.write('error %s' % e.errno)
-                #sys.stdout.write('error %s' % e.strerror)                
-                #sys.stdout.write('\n'.join(os.listdir(hdf5_includedir)))
+            except IOError:
                 return None
     hdf5_version = None
     for line in f:
@@ -262,11 +256,11 @@ HDF5_DIR environment variable not set, checking some standard locations ..\n""")
         if HDF5_incdir is None:
             HDF5_incdir = os.path.join(HDF5_dir, 'include')
         hdf5_version = check_hdf5version(HDF5_incdir)
-        #sys.stdout.write('hdf5_version = %s' % hdf5_version)
-        #if hdf5_version is None:
-        #    raise ValueError('did not find HDF5 headers in %s' % HDF5_incdir)
-        #elif hdf5_version[1:6] < '1.8.0':
-        #    raise ValueError('HDF5 version >= 1.8.0 is required')
+        sys.stdout.write('hdf5_version = %s' % hdf5_version)
+        if hdf5_version is None:
+            raise ValueError('did not find HDF5 headers in %s' % HDF5_incdir)
+        elif hdf5_version[1:6] < '1.8.0':
+            raise ValueError('HDF5 version >= 1.8.0 is required')
 
     if netCDF4_incdir is None and netCDF4_dir is None:
         sys.stdout.write( """
@@ -282,8 +276,7 @@ NETCDF4_DIR environment variable not set, checking standard locations.. \n""")
                 sys.stdout.write('netCDF4 found in %s\n' % netCDF4_dir)
                 break
         if netCDF4_dir is None:
-            pass
-            #raise ValueError('did not find netCDF version 4 headers')
+            raise ValueError('did not find netCDF version 4 headers')
     else:
         if netCDF4_incdir is None:
             netCDF4_incdir = os.path.join(netCDF4_dir, 'include')
